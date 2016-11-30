@@ -11,10 +11,7 @@ RUN dnf -y install supervisor sendmail abrt-cli-ng abrt-addon-ccpp abrt-addon-ke
 LABEL Version=2.0
 
 # Let the ABRT tools know where the rootfs is located.
-RUN sed 's/\(abrt-action-save-package-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
-RUN sed 's/\(abrt-action-save-container-data\)/\1 -r \/host/' -i /etc/libreport/events.d/abrt_event.conf
-RUN sed 's/\(journalctl \)--system/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
-RUN sed 's/\(journalctl.*-b\)/\1 -D \/host\/var\/log\/journal /' -i /etc/libreport/events.d/ccpp_event.conf
+RUN augtool set /files/etc/abrt/abrt.conf/SysRootPath /host
 
 # Testing signature of packages will not work until we install rpm signature
 # keys of all released Fedoras to the image. Let's turn GPG off for now.
@@ -42,6 +39,7 @@ LABEL RUN="docker run -d --privileged \
 -v /:/host \
 -v /dev/log:/dev/log \
 -v /var/run/abrt:/var/run/abrt \
+-v /var/log/journal:/var/log/journal \
 -v /var/run/systemd/journal/socket:/var/run/systemd/journal/socket \
 --pid=host \
 --net=host \
